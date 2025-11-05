@@ -8,7 +8,7 @@ export const defaultTheme = {
   colors: {
     white: '#ffffff',
     black: '#000000',
-    primary: '#3294F8',
+    primary: '#059669',
     'base-title': '#E7EDF4',
     'base-subtitle': '#C4D4E3',
     'base-text': '#AFC2D4',
