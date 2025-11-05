@@ -1,9 +1,9 @@
 import { useContextSelector } from 'use-context-selector'
 import { HomeContainer } from './styles'
-import { GithubProfileContext } from '../../contexts/GithubProfileContext'
+import { GithubContext } from '../../contexts/GithubContext'
 
 export function Home() {
-  const profile = useContextSelector(GithubProfileContext, (context) => {
+  const profile = useContextSelector(GithubContext, (context) => {
     return context.profile
   })
 

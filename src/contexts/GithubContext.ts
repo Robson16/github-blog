@@ -5,17 +5,15 @@ export interface Profile {
   id: number
   avatar_url: string
   name: string
-  company?: string
+  company: string | null
   bio: string
   followers: number
   html_url: string
 }
 
-interface GithubProfileContextType {
+interface GithubContextType {
   profile: Profile | null
   fetchProfile: (profile: Profile | null) => void
 }
 
-export const GithubProfileContext = createContext(
-  {} as GithubProfileContextType,
-)
+export const GithubContext = createContext({} as GithubContextType)

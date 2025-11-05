@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { api } from '../services/github/api'
-import { GithubProfileContext, type Profile } from './GithubProfileContext'
+import { GithubContext, type Profile } from './GithubContext'
 
 const PROFILE_USERNAME = import.meta.env.VITE_GITHUB_USERNAME
 
-interface GithubProfileProviderProps {
+interface GithubProviderProps {
   children: ReactNode
 }
 
-export function GithubProfileProvider({
-  children,
-}: GithubProfileProviderProps) {
+export function GithubProvider({ children }: GithubProviderProps) {
   const [profile, setProfile] = useState<Profile | null>(null)
 
   const fetchProfile = useCallback(async () => {
@@ -23,8 +21,8 @@ export function GithubProfileProvider({
   }, [fetchProfile])
 
   return (
-    <GithubProfileContext.Provider value={{ profile, fetchProfile }}>
+    <GithubContext.Provider value={{ profile, fetchProfile }}>
       {children}
-    </GithubProfileContext.Provider>
+    </GithubContext.Provider>
   )
 }
