@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export const ProfileContainer = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 2rem;
   width: 100%;
   top: -350px;
@@ -12,6 +13,10 @@ export const ProfileContainer = styled.div`
   background-color: ${(props) => props.theme.colors['base-profile']};
   z-index: 1;
   box-shadow: 0px 2px 28px rgba(0, 0, 0, 0.8);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
 `
 
 export const ProfileInfos = styled.div`

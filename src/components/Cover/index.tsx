@@ -1,17 +1,26 @@
 interface CoverProps {
   color: string
   bgcolor: string
+  width: string
+  height: string
+  preserveAspectRatio: string
 }
 
-export function Cover({ color, bgcolor }: CoverProps) {
+export function Cover({
+  color,
+  bgcolor,
+  width,
+  height,
+  preserveAspectRatio,
+}: CoverProps) {
   return (
     <svg
-      width="1440"
-      height="296"
+      preserveAspectRatio={preserveAspectRatio}
+      width={width}
+      height={height}
       viewBox="0 0 1440 296"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ width: '100%', height: 'auto' }}
     >
       <g clipPath="url(#clip0_401_609)">
         <rect width="1440" height="296" fill={bgcolor} />
