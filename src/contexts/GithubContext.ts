@@ -11,9 +11,27 @@ export interface Profile {
   html_url: string
 }
 
+export interface IssueUser {
+  login: string
+}
+
+export interface Issue {
+  id: number
+  title: string
+  body: string
+  created_at: string
+  number: number
+  html_url: string
+  comments: number
+  user: IssueUser
+}
+
 interface GithubContextType {
   profile: Profile | null
   fetchProfile: (profile: Profile | null) => void
+  issues: Issue[]
+  issuesTotalPages: number
+  fetchIssues: () => void
 }
 
 export const GithubContext = createContext({} as GithubContextType)
