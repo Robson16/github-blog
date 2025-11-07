@@ -20,45 +20,55 @@ export function GithubProvider({ children }: GithubProviderProps) {
     setProfile(response.data)
   }, [])
 
-  const fetchIssues = useCallback(async () => {
+  const fetchTotalIssuesCount = useCallback(async () => {
+    if (!PROFILE_USERNAME || !REPONAME) return
+
+    try {
+      const response = await api.get('search/issues', {
+        params: {
+          q: `repo:${PROFILE_USERNAME}/${REPONAME} is:issue state:open`,
+        },
+      })
+
+      const totalItems = response.data.total_count
+      const totalPages = Math.ceil(totalItems / PER_PAGE)
+      setIssuesTotalPages(totalPages || 1) // At least 1 page
+    } catch (error) {
+      console.error('Failed to fetch total issues count:', error)
+      // Safe fallback if the search fails: leave it as 0 or 1 and use the "Next" button.
+      setIssuesTotalPages(0)
+    }
+  }, [])
+
+  const fetchIssues = useCallback(async (page = 1, perPage = PER_PAGE) => {
     const response = await api.get(
       `repos/${PROFILE_USERNAME}/${REPONAME}/issues`,
       {
         params: {
-          page: 1,
-          per_page: PER_PAGE,
+          page,
+          per_page: perPage,
+          state: 'open',
+          sort: 'created',
+          direction: 'desc',
         },
       },
     )
 
     setIssues(response.data)
-
-    // Check if there are more pages
-    const linkHeader = response.headers.link
-    try {
-      // Search for total issues using the search API
-      const countResponse = await api.get(
-        `search/issues?q=repo:${PROFILE_USERNAME}/${REPONAME}+is:issue`,
-      )
-      const totalItems = countResponse.data.total_count
-      const totalPages = Math.ceil(totalItems / PER_PAGE)
-      setIssuesTotalPages(totalPages)
-    } catch (error) {
-      console.error('Error fetching total count:', error)
-      // Fallback: If it says "next," it's at least 2 pages; otherwise, it's 1.
-      const hasNextPage = linkHeader?.includes('rel="next"') ?? false
-      setIssuesTotalPages(hasNextPage ? 2 : 1)
-    }
   }, [])
 
   useEffect(() => {
     fetchProfile()
+    fetchTotalIssuesCount()
+  }, [fetchProfile, fetchTotalIssuesCount])
+
+  useEffect(() => {
     fetchIssues()
-  }, [fetchIssues, fetchProfile])
+  }, [fetchIssues])
 
   return (
     <GithubContext.Provider
-      value={{ issues, issuesTotalPages, profile, fetchProfile, fetchIssues }}
+      value={{ profile, fetchProfile, issues, issuesTotalPages, fetchIssues }}
     >
       {children}
     </GithubContext.Provider>

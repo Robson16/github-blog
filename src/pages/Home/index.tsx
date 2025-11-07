@@ -1,6 +1,8 @@
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useEffect, useState } from 'react'
 import { useContextSelector } from 'use-context-selector'
+import { Pagination } from '../../components/Pagination'
 import { Profile } from '../../components/Profile'
 import { GithubContext } from '../../contexts/GithubContext'
 import { HomeContainer, IssueItem, IssueList } from './styles'
@@ -13,6 +15,22 @@ export function Home() {
   const issuesTotalPages = useContextSelector(GithubContext, (context) => {
     return context.issuesTotalPages
   })
+
+  const fetchIssues = useContextSelector(GithubContext, (context) => {
+    return context.fetchIssues
+  })
+
+  const [currentPage, setCurrentPage] = useState(1)
+
+  useEffect(() => {
+    fetchIssues(currentPage)
+  }, [currentPage, fetchIssues])
+
+  useEffect(() => {
+    if (issuesTotalPages > 0 && currentPage > issuesTotalPages) {
+      setCurrentPage(issuesTotalPages)
+    }
+  }, [currentPage, issuesTotalPages])
 
   return (
     <HomeContainer>
@@ -37,7 +55,11 @@ export function Home() {
         })}
       </IssueList>
 
-      <p>Total de páginas: {issuesTotalPages}</p>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={issuesTotalPages}
+        onPageChange={setCurrentPage}
+      />
     </HomeContainer>
   )
 }

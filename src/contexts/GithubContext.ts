@@ -31,7 +31,7 @@ interface GithubContextType {
   fetchProfile: (profile: Profile | null) => void
   issues: Issue[]
   issuesTotalPages: number
-  fetchIssues: () => void
+  fetchIssues: (page?: number, perPage?: number) => void
 }
 
 export const GithubContext = createContext({} as GithubContextType)
