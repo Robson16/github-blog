@@ -43,6 +43,7 @@ export const IssueItem = styled.div`
     h1 {
       font-size: 1.25rem;
       color: ${(props) => props.theme.colors['base-title']};
+      overflow-wrap: anywhere;
     }
 
     span {

@@ -1,6 +1,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useContextSelector } from 'use-context-selector'
 import { Pagination } from '../../components/Pagination'
 import { Profile } from '../../components/Profile'
@@ -20,17 +21,34 @@ export function Home() {
     return context.fetchIssues
   })
 
-  const [currentPage, setCurrentPage] = useState(1)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const pageFromUrl = Number(searchParams.get('page'))
+  const currentPage = pageFromUrl && pageFromUrl > 0 ? pageFromUrl : 1
+
+  function handlePageChange(page: number) {
+    setSearchParams((state) => {
+      state.set('page', String(page))
+      return state
+    })
+  }
 
   useEffect(() => {
     fetchIssues(currentPage)
   }, [currentPage, fetchIssues])
 
+  // If the total number of pages has loaded and we are on an invalid page, correct the URL.
   useEffect(() => {
     if (issuesTotalPages > 0 && currentPage > issuesTotalPages) {
-      setCurrentPage(issuesTotalPages)
+      setSearchParams(
+        (state) => {
+          state.set('page', String(issuesTotalPages))
+          return state
+        },
+        { replace: true },
+      ) // replace: true to avoid cluttering the history
     }
-  }, [currentPage, issuesTotalPages])
+  }, [currentPage, issuesTotalPages, setSearchParams])
 
   return (
     <HomeContainer>
@@ -58,7 +76,7 @@ export function Home() {
       <Pagination
         currentPage={currentPage}
         totalPages={issuesTotalPages}
-        onPageChange={setCurrentPage}
+        onPageChange={handlePageChange}
       />
     </HomeContainer>
   )
