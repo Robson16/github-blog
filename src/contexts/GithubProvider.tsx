@@ -20,47 +20,36 @@ export function GithubProvider({ children }: GithubProviderProps) {
     setProfile(response.data)
   }, [])
 
-  const fetchTotalIssuesCount = useCallback(async () => {
-    if (!PROFILE_USERNAME || !REPONAME) return
+  const fetchIssues = useCallback(
+    async (query = '', page = 1, perPage = PER_PAGE) => {
+      if (!PROFILE_USERNAME || !REPONAME) return
 
-    try {
-      const response = await api.get('search/issues', {
-        params: {
-          q: `repo:${PROFILE_USERNAME}/${REPONAME} is:issue state:open`,
-        },
-      })
+      try {
+        const response = await api.get('search/issues', {
+          params: {
+            q: `repo:${PROFILE_USERNAME}/${REPONAME} is:issue state:open ${query}`,
+            page,
+            per_page: perPage,
+            sort: 'created',
+            direction: 'desc',
+          },
+        })
 
-      const totalItems = response.data.total_count
-      const totalPages = Math.ceil(totalItems / PER_PAGE)
-      setIssuesTotalPages(totalPages || 1) // At least 1 page
-    } catch (error) {
-      console.error('Failed to fetch total issues count:', error)
-      // Safe fallback if the search fails: leave it as 0 or 1 and use the "Next" button.
-      setIssuesTotalPages(0)
-    }
-  }, [])
+        const totalItems = response.data.total_count
+        const totalPages = Math.ceil(totalItems / PER_PAGE)
 
-  const fetchIssues = useCallback(async (page = 1, perPage = PER_PAGE) => {
-    const response = await api.get(
-      `repos/${PROFILE_USERNAME}/${REPONAME}/issues`,
-      {
-        params: {
-          page,
-          per_page: perPage,
-          state: 'open',
-          sort: 'created',
-          direction: 'desc',
-        },
-      },
-    )
-
-    setIssues(response.data)
-  }, [])
+        setIssues(response.data.items)
+        setIssuesTotalPages(totalPages || 1)
+      } catch (error) {
+        console.error('Failed to fetch issues:', error)
+      }
+    },
+    [],
+  )
 
   useEffect(() => {
     fetchProfile()
-    fetchTotalIssuesCount()
-  }, [fetchProfile, fetchTotalIssuesCount])
+  }, [fetchProfile])
 
   useEffect(() => {
     fetchIssues()

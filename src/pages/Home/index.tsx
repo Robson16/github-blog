@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useContextSelector } from 'use-context-selector'
 import { Pagination } from '../../components/Pagination'
 import { Profile } from '../../components/Profile'
+import { SearchForm } from '../../components/SearchForm'
 import { GithubContext } from '../../contexts/GithubContext'
 import { HomeContainer, IssueItem, IssueList } from './styles'
 
@@ -26,6 +27,8 @@ export function Home() {
   const pageFromUrl = Number(searchParams.get('page'))
   const currentPage = pageFromUrl && pageFromUrl > 0 ? pageFromUrl : 1
 
+  const queryFromUrl = searchParams.get('q') || ''
+
   function handlePageChange(page: number) {
     setSearchParams((state) => {
       state.set('page', String(page))
@@ -34,8 +37,8 @@ export function Home() {
   }
 
   useEffect(() => {
-    fetchIssues(currentPage)
-  }, [currentPage, fetchIssues])
+    fetchIssues(queryFromUrl, currentPage)
+  }, [currentPage, queryFromUrl, fetchIssues])
 
   // If the total number of pages has loaded and we are on an invalid page, correct the URL.
   useEffect(() => {
@@ -53,6 +56,7 @@ export function Home() {
   return (
     <HomeContainer>
       <Profile />
+      <SearchForm />
 
       <IssueList>
         {issues.map((issue) => {
