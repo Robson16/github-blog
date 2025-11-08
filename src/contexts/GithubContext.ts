@@ -30,6 +30,7 @@ interface GithubContextType {
   profile: Profile | null
   fetchProfile: (profile: Profile | null) => void
   issues: Issue[]
+  issuesTotal: number
   issuesTotalPages: number
   fetchIssues: (
     query?: string,

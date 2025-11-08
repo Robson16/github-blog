@@ -14,6 +14,10 @@ export function Home() {
     return context.issues
   })
 
+  const issuesTotal = useContextSelector(GithubContext, (context) => {
+    return context.issuesTotal
+  })
+
   const issuesTotalPages = useContextSelector(GithubContext, (context) => {
     return context.issuesTotalPages
   })
@@ -56,6 +60,12 @@ export function Home() {
   return (
     <HomeContainer>
       <Profile />
+
+      <header>
+        <h1>Issues</h1>
+        <span>{issuesTotal} issues</span>
+      </header>
+
       <SearchForm />
 
       <IssueList>

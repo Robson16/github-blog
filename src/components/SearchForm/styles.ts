@@ -3,7 +3,6 @@ import styled from 'styled-components'
 export const SearchFormContainer = styled.form`
   display: flex;
   gap: 1rem;
-  margin: 4.5rem 0 0;
 
   input {
     flex: 1;

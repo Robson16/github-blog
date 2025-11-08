@@ -9,6 +9,25 @@ export const HomeContainer = styled.main`
   margin: ${(props) => props.theme.container.margin};
   padding-top: 3.5rem;
   padding-bottom: 3.5rem;
+
+  & > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4.5rem;
+    margin-bottom: 1rem;
+
+    h1 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: ${(props) => props.theme.colors['base-subtitle']};
+    }
+
+    span {
+      font-size: 0.875rem;
+      color: ${(props) => props.theme.colors['base-span']};
+    }
+  }
 `
 
 export const IssueList = styled.div`

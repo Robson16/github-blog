@@ -13,6 +13,7 @@ interface GithubProviderProps {
 export function GithubProvider({ children }: GithubProviderProps) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [issues, setIssues] = useState<Issue[]>([])
+  const [issuesTotal, setIssuesTotal] = useState(0)
   const [issuesTotalPages, setIssuesTotalPages] = useState(0)
 
   const fetchProfile = useCallback(async () => {
@@ -39,6 +40,7 @@ export function GithubProvider({ children }: GithubProviderProps) {
         const totalPages = Math.ceil(totalItems / PER_PAGE)
 
         setIssues(response.data.items)
+        setIssuesTotal(totalItems)
         setIssuesTotalPages(totalPages || 1)
       } catch (error) {
         console.error('Failed to fetch issues:', error)
@@ -57,7 +59,14 @@ export function GithubProvider({ children }: GithubProviderProps) {
 
   return (
     <GithubContext.Provider
-      value={{ profile, fetchProfile, issues, issuesTotalPages, fetchIssues }}
+      value={{
+        profile,
+        fetchProfile,
+        issues,
+        issuesTotal,
+        issuesTotalPages,
+        fetchIssues,
+      }}
     >
       {children}
     </GithubContext.Provider>
