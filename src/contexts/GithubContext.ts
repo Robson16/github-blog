@@ -37,6 +37,7 @@ interface GithubContextType {
     page?: number,
     perPage?: number,
   ) => Promise<void>
+  fetchIssue: (issueNumber: number) => Promise<Issue | null>
 }
 
 export const GithubContext = createContext({} as GithubContextType)

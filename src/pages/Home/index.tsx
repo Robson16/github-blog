@@ -71,7 +71,7 @@ export function Home() {
       <IssueList>
         {issues.map((issue) => {
           return (
-            <IssueItem key={issue.id}>
+            <IssueItem key={issue.id} to={`/issue/${issue.number}`}>
               <header>
                 <h1>{issue.title.slice(0, 46) + '...'}</h1>
                 <span>

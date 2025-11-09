@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const HomeContainer = styled.main`
@@ -44,13 +45,21 @@ export const IssueList = styled.div`
   }
 `
 
-export const IssueItem = styled.div`
+export const IssueItem = styled(Link)`
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   padding: 2rem;
   border-radius: 10px;
   background-color: ${(props) => props.theme.colors['base-post']};
+  border: 2px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    transition: border-color 0.2s;
+    border-color: ${(props) => props.theme.colors['base-border']};
+  }
 
   header {
     display: flex;

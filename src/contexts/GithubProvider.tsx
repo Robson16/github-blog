@@ -49,6 +49,20 @@ export function GithubProvider({ children }: GithubProviderProps) {
     [],
   )
 
+  const fetchIssue = useCallback(async (issueNumber: number) => {
+    if (!PROFILE_USERNAME || !REPONAME) return
+
+    try {
+      const response = await api.get(
+        `repos/${PROFILE_USERNAME}/${REPONAME}/issues/${issueNumber}`,
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch issue details:', error)
+    }
+  }, [])
+
   useEffect(() => {
     fetchProfile()
   }, [fetchProfile])
@@ -66,6 +80,7 @@ export function GithubProvider({ children }: GithubProviderProps) {
         issuesTotal,
         issuesTotalPages,
         fetchIssues,
+        fetchIssue,
       }}
     >
       {children}
