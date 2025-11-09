@@ -3,6 +3,7 @@ import { ptBR } from 'date-fns/locale'
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useContextSelector } from 'use-context-selector'
+import { Header } from '../../components/Header'
 import { Pagination } from '../../components/Pagination'
 import { Profile } from '../../components/Profile'
 import { SearchForm } from '../../components/SearchForm'
@@ -58,40 +59,44 @@ export function Home() {
   }, [currentPage, issuesTotalPages, setSearchParams])
 
   return (
-    <HomeContainer>
-      <Profile />
+    <>
+      <Header>
+        <Profile />
+      </Header>
 
-      <header>
-        <h1>Issues</h1>
-        <span>{issuesTotal} issues</span>
-      </header>
+      <HomeContainer>
+        <header>
+          <h1>Issues</h1>
+          <span>{issuesTotal} issues</span>
+        </header>
 
-      <SearchForm />
+        <SearchForm />
 
-      <IssueList>
-        {issues.map((issue) => {
-          return (
-            <IssueItem key={issue.id} to={`/issue/${issue.number}`}>
-              <header>
-                <h1>{issue.title.slice(0, 46) + '...'}</h1>
-                <span>
-                  {formatDistanceToNow(new Date(issue.created_at), {
-                    addSuffix: true,
-                    locale: ptBR,
-                  })}
-                </span>
-              </header>
-              <p>{issue.body.slice(0, 150) + '...'}</p>
-            </IssueItem>
-          )
-        })}
-      </IssueList>
+        <IssueList>
+          {issues.map((issue) => {
+            return (
+              <IssueItem key={issue.id} to={`/issue/${issue.number}`}>
+                <header>
+                  <h1>{issue.title.slice(0, 46) + '...'}</h1>
+                  <span>
+                    {formatDistanceToNow(new Date(issue.created_at), {
+                      addSuffix: true,
+                      locale: ptBR,
+                    })}
+                  </span>
+                </header>
+                <p>{issue.body.slice(0, 150) + '...'}</p>
+              </IssueItem>
+            )
+          })}
+        </IssueList>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={issuesTotalPages}
-        onPageChange={handlePageChange}
-      />
-    </HomeContainer>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={issuesTotalPages}
+          onPageChange={handlePageChange}
+        />
+      </HomeContainer>
+    </>
   )
 }

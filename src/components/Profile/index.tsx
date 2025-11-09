@@ -1,14 +1,17 @@
-import { FaBuilding, FaUserGroup } from 'react-icons/fa6'
-import { FiExternalLink } from 'react-icons/fi'
-import { IoLogoGithub } from 'react-icons/io5'
+import {
+  IoBusiness,
+  IoLogoGithub,
+  IoOpenOutline,
+  IoPeopleSharp,
+} from 'react-icons/io5'
 import { useContextSelector } from 'use-context-selector'
 import { GithubContext } from '../../contexts/GithubContext'
+import { ListIcons } from '../ListIcons'
 import {
   ProfileAvatar,
   ProfileContainer,
   ProfileGithubLink,
   ProfileInfos,
-  ProfileListIcon,
   ProfileTitle,
 } from './styles'
 
@@ -33,10 +36,12 @@ export function Profile() {
             rel="noopener noreferrer"
           >
             GitHub
-            <FiExternalLink size={16} />
+            <IoOpenOutline size={16} />
           </ProfileGithubLink>
+
           <p>{profile.bio}</p>
-          <ProfileListIcon>
+
+          <ListIcons>
             <li>
               <IoLogoGithub size={20} />
               {profile.login}
@@ -44,16 +49,16 @@ export function Profile() {
 
             {profile.company && (
               <li>
-                <FaBuilding size={20} />
+                <IoBusiness size={20} />
                 {profile.company}
               </li>
             )}
 
             <li>
-              <FaUserGroup size={20} />
+              <IoPeopleSharp size={20} />
               {profile.followers}
             </li>
-          </ProfileListIcon>
+          </ListIcons>
         </ProfileInfos>
       </ProfileContainer>
     )
