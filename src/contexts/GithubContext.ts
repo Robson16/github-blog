@@ -27,8 +27,7 @@ export interface Issue {
 }
 
 interface GithubContextType {
-  profile: Profile | null
-  fetchProfile: (profile: Profile | null) => void
+  fetchProfile: (profile: string) => Promise<Profile | null>
   issues: Issue[]
   issuesTotal: number
   issuesTotalPages: number

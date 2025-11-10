@@ -1,7 +1,7 @@
+import { AxiosError } from 'axios'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { api } from '../services/github/api'
-import { GithubContext, type Issue, type Profile } from './GithubContext'
-import { AxiosError } from 'axios'
+import { GithubContext, type Issue } from './GithubContext'
 
 const PROFILE_USERNAME = import.meta.env.VITE_GITHUB_USERNAME
 const REPONAME = import.meta.env.VITE_GITHUB_REPONAME
@@ -12,16 +12,21 @@ interface GithubProviderProps {
 }
 
 export function GithubProvider({ children }: GithubProviderProps) {
-  const [profile, setProfile] = useState<Profile | null>(null)
   const [issues, setIssues] = useState<Issue[]>([])
   const [issuesTotal, setIssuesTotal] = useState(0)
   const [issuesTotalPages, setIssuesTotalPages] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchProfile = useCallback(async () => {
-    const response = await api.get(`users/${PROFILE_USERNAME}`)
-    setProfile(response.data)
+  const fetchProfile = useCallback(async (profile: string) => {
+    if (!profile) return
+
+    try {
+      const response = await api.get(`users/${profile}`)
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch profile:', error)
+    }
   }, [])
 
   const fetchIssues = useCallback(
@@ -79,17 +84,12 @@ export function GithubProvider({ children }: GithubProviderProps) {
   }, [])
 
   useEffect(() => {
-    fetchProfile()
-  }, [fetchProfile])
-
-  useEffect(() => {
     fetchIssues()
   }, [fetchIssues])
 
   return (
     <GithubContext.Provider
       value={{
-        profile,
         fetchProfile,
         issues,
         issuesTotal,

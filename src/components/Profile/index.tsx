@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   IoBusiness,
   IoLogoGithub,
@@ -5,7 +6,7 @@ import {
   IoPeopleSharp,
 } from 'react-icons/io5'
 import { useContextSelector } from 'use-context-selector'
-import { GithubContext } from '../../contexts/GithubContext'
+import { GithubContext, type Profile } from '../../contexts/GithubContext'
 import { ListIcons } from '../ListIcons'
 import {
   ProfileAvatar,
@@ -15,10 +16,31 @@ import {
   ProfileTitle,
 } from './styles'
 
+const PROFILE_USERNAME = import.meta.env.VITE_GITHUB_USERNAME
+
 export function Profile() {
-  const profile = useContextSelector(GithubContext, (context) => {
-    return context.profile
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  const fetchProfile = useContextSelector(GithubContext, (context) => {
+    return context.fetchProfile
   })
+
+  useEffect(() => {
+    async function loadProfile() {
+      const profile = await fetchProfile(PROFILE_USERNAME)
+      setProfile(profile)
+    }
+
+    loadProfile()
+  }, [fetchProfile])
+
+  if (!profile) {
+    return (
+      <ProfileContainer>
+        <p>Loading...</p>
+      </ProfileContainer>
+    )
+  }
 
   return (
     profile && (
