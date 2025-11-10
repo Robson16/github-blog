@@ -1,7 +1,11 @@
-import { AxiosError } from 'axios'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, type ReactNode } from 'react'
 import { api } from '../services/github/api'
-import { GithubContext, type Issue } from './GithubContext'
+import {
+  GithubContext,
+  type FetchIssueResponse,
+  type Issue,
+  type Profile,
+} from './GithubContext'
 
 const PROFILE_USERNAME = import.meta.env.VITE_GITHUB_USERNAME
 const REPONAME = import.meta.env.VITE_GITHUB_REPONAME
@@ -12,92 +16,61 @@ interface GithubProviderProps {
 }
 
 export function GithubProvider({ children }: GithubProviderProps) {
-  const [issues, setIssues] = useState<Issue[]>([])
-  const [issuesTotal, setIssuesTotal] = useState(0)
-  const [issuesTotalPages, setIssuesTotalPages] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const fetchProfile = useCallback(async (): Promise<Profile | undefined> => {
+    if (!PROFILE_USERNAME) return
 
-  const fetchProfile = useCallback(async (profile: string) => {
-    if (!profile) return
-
-    try {
-      const response = await api.get(`users/${profile}`)
-      return response.data
-    } catch (error) {
-      console.error('Failed to fetch profile:', error)
-    }
+    const response = await api.get(`users/${PROFILE_USERNAME}`)
+    return response.data
   }, [])
 
   const fetchIssues = useCallback(
-    async (query = '', page = 1, perPage = PER_PAGE) => {
-      if (!PROFILE_USERNAME || !REPONAME) return
+    async (
+      query = '',
+      page = 1,
+      perPage = PER_PAGE,
+    ): Promise<FetchIssueResponse> => {
+      if (!PROFILE_USERNAME || !REPONAME) {
+        return { totalItems: 0, totalPages: 0, items: [] }
+      }
 
-      setIsLoading(true)
-      setError(null)
+      const response = await api.get('search/issues', {
+        params: {
+          q: `repo:${PROFILE_USERNAME}/${REPONAME} is:issue state:open ${query}`,
+          page,
+          per_page: perPage,
+          sort: 'created',
+          direction: 'desc',
+        },
+      })
 
-      try {
-        const response = await api.get('search/issues', {
-          params: {
-            q: `repo:${PROFILE_USERNAME}/${REPONAME} is:issue state:open ${query}`,
-            page,
-            per_page: perPage,
-            sort: 'created',
-            direction: 'desc',
-          },
-        })
-
-        const totalItems = response.data.total_count
-        const totalPages = Math.ceil(totalItems / PER_PAGE)
-
-        setIssues(response.data.items)
-        setIssuesTotal(totalItems)
-        setIssuesTotalPages(totalPages || 1)
-      } catch (error) {
-        if (error instanceof AxiosError && error.response?.status === 403) {
-          setError(
-            'GitHub API request limit reached. Please try again later or add an API token.',
-          )
-        } else {
-          setError('An error occurred while retrieving the issues.')
-        }
-        console.error('Failed to fetch issues:', error)
-      } finally {
-        setIsLoading(false)
+      return {
+        totalItems: response.data.total_count,
+        totalPages: Math.ceil(response.data.total_count / perPage) || 1,
+        items: response.data.items,
       }
     },
     [],
   )
 
-  const fetchIssue = useCallback(async (issueNumber: number) => {
-    if (!PROFILE_USERNAME || !REPONAME) return
+  const fetchIssue = useCallback(
+    async (issueNumber: number): Promise<Issue | undefined> => {
+      if (!PROFILE_USERNAME || !REPONAME) return
 
-    try {
       const response = await api.get(
         `repos/${PROFILE_USERNAME}/${REPONAME}/issues/${issueNumber}`,
       )
 
       return response.data
-    } catch (error) {
-      console.error('Failed to fetch issue details:', error)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchIssues()
-  }, [fetchIssues])
+    },
+    [],
+  )
 
   return (
     <GithubContext.Provider
       value={{
         fetchProfile,
-        issues,
-        issuesTotal,
-        issuesTotalPages,
         fetchIssues,
         fetchIssue,
-        isLoading,
-        error,
       }}
     >
       {children}

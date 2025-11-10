@@ -16,7 +16,7 @@ export const HomeContainer = styled.main`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 4.5rem;
+    margin-top: 2.5rem;
     margin-bottom: 1rem;
 
     h1 {
@@ -88,7 +88,7 @@ export const IssueItem = styled(Link)`
   }
 `
 
-export const ErrorMessage = styled.p`
+export const Message = styled.p`
   flex: 1;
   display: flex;
   justify-content: center;

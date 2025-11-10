@@ -26,19 +26,20 @@ export interface Issue {
   user: IssueUser
 }
 
+export interface FetchIssueResponse {
+  totalItems: number
+  totalPages: number
+  items: Issue[]
+}
+
 interface GithubContextType {
-  fetchProfile: (profile: string) => Promise<Profile | null>
-  issues: Issue[]
-  issuesTotal: number
-  issuesTotalPages: number
+  fetchProfile: () => Promise<Profile | undefined>
   fetchIssues: (
     query?: string,
     page?: number,
     perPage?: number,
-  ) => Promise<void>
-  fetchIssue: (issueNumber: number) => Promise<Issue | null>
-  isLoading: boolean
-  error: string | null
+  ) => Promise<FetchIssueResponse>
+  fetchIssue: (issueNumber: number) => Promise<Issue | undefined>
 }
 
 export const GithubContext = createContext({} as GithubContextType)

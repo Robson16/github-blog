@@ -1,41 +1,28 @@
+import { AxiosError } from 'axios'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useContextSelector } from 'use-context-selector'
 import { Header } from '../../components/Header'
 import { Pagination } from '../../components/Pagination'
 import { Profile } from '../../components/Profile'
 import { SearchForm } from '../../components/SearchForm'
-import { GithubContext } from '../../contexts/GithubContext'
-import { ErrorMessage, HomeContainer, IssueItem, IssueList } from './styles'
+import { GithubContext, type Issue } from '../../contexts/GithubContext'
+import { HomeContainer, IssueItem, IssueList, Message } from './styles'
 
 export function Home() {
-  const issues = useContextSelector(GithubContext, (context) => {
-    return context.issues
-  })
+  const [issues, setIssues] = useState<Issue[]>([])
+  const [issuesTotal, setIssuesTotal] = useState(0)
+  const [issuesTotalPages, setIssuesTotalPages] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const issuesTotal = useContextSelector(GithubContext, (context) => {
-    return context.issuesTotal
-  })
-
-  const issuesTotalPages = useContextSelector(GithubContext, (context) => {
-    return context.issuesTotalPages
-  })
-
-  const isLoading = useContextSelector(GithubContext, (context) => {
-    return context.isLoading
-  })
-
-  const error = useContextSelector(GithubContext, (context) => {
-    return context.error
-  })
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const fetchIssues = useContextSelector(GithubContext, (context) => {
     return context.fetchIssues
   })
-
-  const [searchParams, setSearchParams] = useSearchParams()
 
   const pageFromUrl = Number(searchParams.get('page'))
   const currentPage = pageFromUrl && pageFromUrl > 0 ? pageFromUrl : 1
@@ -50,7 +37,34 @@ export function Home() {
   }
 
   useEffect(() => {
-    fetchIssues(queryFromUrl, currentPage)
+    async function loadIssues() {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        const { items, totalItems, totalPages } = await fetchIssues(
+          queryFromUrl,
+          currentPage,
+        )
+
+        setIssues(items)
+        setIssuesTotal(totalItems)
+        setIssuesTotalPages(totalPages)
+      } catch (error) {
+        if (error instanceof AxiosError && error.response?.status === 403) {
+          setError(
+            'GitHub API request limit reached. Please try again later or add an API token.',
+          )
+        } else {
+          setError('An error occurred while retrieving the issues.')
+        }
+        console.error('Failed to fetch issues:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadIssues()
   }, [currentPage, queryFromUrl, fetchIssues])
 
   // If the total number of pages has loaded and we are on an invalid page, correct the URL.
@@ -73,7 +87,7 @@ export function Home() {
           <Profile />
         </Header>
         <HomeContainer>
-          <ErrorMessage>{error}</ErrorMessage>
+          <Message>{error}</Message>
         </HomeContainer>
       </>
     )
@@ -86,17 +100,17 @@ export function Home() {
       </Header>
 
       <HomeContainer>
-        {isLoading && <p>Loading...</p>}
+        <header>
+          <h1>Issues</h1>
+          <span>{issuesTotal} issues</span>
+        </header>
 
-        {issues.length > 0 ? (
+        <SearchForm />
+
+        {isLoading ? (
+          <Message>Loading...</Message>
+        ) : issues.length > 0 ? (
           <>
-            <header>
-              <h1>Issues</h1>
-              <span>{issuesTotal} issues</span>
-            </header>
-
-            <SearchForm />
-
             <IssueList>
               {issues.map((issue) => {
                 return (
@@ -123,7 +137,7 @@ export function Home() {
             />
           </>
         ) : (
-          <ErrorMessage>No Issues found.</ErrorMessage>
+          <Message>No Issues found.</Message>
         )}
       </HomeContainer>
     </>
