@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { api } from '../services/github/api'
 import { GithubContext, type Issue, type Profile } from './GithubContext'
+import { AxiosError } from 'axios'
 
 const PROFILE_USERNAME = import.meta.env.VITE_GITHUB_USERNAME
 const REPONAME = import.meta.env.VITE_GITHUB_REPONAME
@@ -15,6 +16,8 @@ export function GithubProvider({ children }: GithubProviderProps) {
   const [issues, setIssues] = useState<Issue[]>([])
   const [issuesTotal, setIssuesTotal] = useState(0)
   const [issuesTotalPages, setIssuesTotalPages] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = useCallback(async () => {
     const response = await api.get(`users/${PROFILE_USERNAME}`)
@@ -24,6 +27,9 @@ export function GithubProvider({ children }: GithubProviderProps) {
   const fetchIssues = useCallback(
     async (query = '', page = 1, perPage = PER_PAGE) => {
       if (!PROFILE_USERNAME || !REPONAME) return
+
+      setIsLoading(true)
+      setError(null)
 
       try {
         const response = await api.get('search/issues', {
@@ -43,7 +49,16 @@ export function GithubProvider({ children }: GithubProviderProps) {
         setIssuesTotal(totalItems)
         setIssuesTotalPages(totalPages || 1)
       } catch (error) {
+        if (error instanceof AxiosError && error.response?.status === 403) {
+          setError(
+            'GitHub API request limit reached. Please try again later or add an API token.',
+          )
+        } else {
+          setError('An error occurred while retrieving the issues.')
+        }
         console.error('Failed to fetch issues:', error)
+      } finally {
+        setIsLoading(false)
       }
     },
     [],
@@ -81,6 +96,8 @@ export function GithubProvider({ children }: GithubProviderProps) {
         issuesTotalPages,
         fetchIssues,
         fetchIssue,
+        isLoading,
+        error,
       }}
     >
       {children}

@@ -38,6 +38,8 @@ interface GithubContextType {
     perPage?: number,
   ) => Promise<void>
   fetchIssue: (issueNumber: number) => Promise<Issue | null>
+  isLoading: boolean
+  error: string | null
 }
 
 export const GithubContext = createContext({} as GithubContextType)

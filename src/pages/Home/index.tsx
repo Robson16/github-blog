@@ -8,7 +8,7 @@ import { Pagination } from '../../components/Pagination'
 import { Profile } from '../../components/Profile'
 import { SearchForm } from '../../components/SearchForm'
 import { GithubContext } from '../../contexts/GithubContext'
-import { HomeContainer, IssueItem, IssueList } from './styles'
+import { ErrorMessage, HomeContainer, IssueItem, IssueList } from './styles'
 
 export function Home() {
   const issues = useContextSelector(GithubContext, (context) => {
@@ -21,6 +21,14 @@ export function Home() {
 
   const issuesTotalPages = useContextSelector(GithubContext, (context) => {
     return context.issuesTotalPages
+  })
+
+  const isLoading = useContextSelector(GithubContext, (context) => {
+    return context.isLoading
+  })
+
+  const error = useContextSelector(GithubContext, (context) => {
+    return context.error
   })
 
   const fetchIssues = useContextSelector(GithubContext, (context) => {
@@ -58,6 +66,19 @@ export function Home() {
     }
   }, [currentPage, issuesTotalPages, setSearchParams])
 
+  if (error) {
+    return (
+      <>
+        <Header>
+          <Profile />
+        </Header>
+        <HomeContainer>
+          <ErrorMessage>{error}</ErrorMessage>
+        </HomeContainer>
+      </>
+    )
+  }
+
   return (
     <>
       <Header>
@@ -65,37 +86,45 @@ export function Home() {
       </Header>
 
       <HomeContainer>
-        <header>
-          <h1>Issues</h1>
-          <span>{issuesTotal} issues</span>
-        </header>
+        {isLoading && <p>Loading...</p>}
 
-        <SearchForm />
+        {issues.length > 0 ? (
+          <>
+            <header>
+              <h1>Issues</h1>
+              <span>{issuesTotal} issues</span>
+            </header>
 
-        <IssueList>
-          {issues.map((issue) => {
-            return (
-              <IssueItem key={issue.id} to={`/issue/${issue.number}`}>
-                <header>
-                  <h1>{issue.title.slice(0, 46) + '...'}</h1>
-                  <span>
-                    {formatDistanceToNow(new Date(issue.created_at), {
-                      addSuffix: true,
-                      locale: ptBR,
-                    })}
-                  </span>
-                </header>
-                <p>{issue.body.slice(0, 150) + '...'}</p>
-              </IssueItem>
-            )
-          })}
-        </IssueList>
+            <SearchForm />
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={issuesTotalPages}
-          onPageChange={handlePageChange}
-        />
+            <IssueList>
+              {issues.map((issue) => {
+                return (
+                  <IssueItem key={issue.id} to={`/issue/${issue.number}`}>
+                    <header>
+                      <h1>{issue.title.slice(0, 46) + '...'}</h1>
+                      <span>
+                        {formatDistanceToNow(new Date(issue.created_at), {
+                          addSuffix: true,
+                          locale: ptBR,
+                        })}
+                      </span>
+                    </header>
+                    <p>{issue.body.slice(0, 150) + '...'}</p>
+                  </IssueItem>
+                )
+              })}
+            </IssueList>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={issuesTotalPages}
+              onPageChange={handlePageChange}
+            />
+          </>
+        ) : (
+          <ErrorMessage>No Issues found.</ErrorMessage>
+        )}
       </HomeContainer>
     </>
   )

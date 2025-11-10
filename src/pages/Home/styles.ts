@@ -10,6 +10,7 @@ export const HomeContainer = styled.main`
   margin: ${(props) => props.theme.container.margin};
   padding-top: 3.5rem;
   padding-bottom: 3.5rem;
+  margin-top: 4.5rem;
 
   & > header {
     display: flex;
@@ -85,4 +86,16 @@ export const IssueItem = styled(Link)`
     color: ${(props) => props.theme.colors['base-text']};
     overflow-wrap: break-word;
   }
+`
+
+export const ErrorMessage = styled.p`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 2rem 1rem;
+  color: ${(props) => props.theme.colors['base-text']};
+  font-size: 1.5rem;
+  font-weight: 700;
 `

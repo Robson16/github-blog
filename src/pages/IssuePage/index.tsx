@@ -64,7 +64,7 @@ export function IssuePage() {
   if (!issue) {
     return (
       <IssueContainer>
-        <LoadingMessage>Carregando...</LoadingMessage>
+        <LoadingMessage>Loading...</LoadingMessage>
       </IssueContainer>
     )
   }

@@ -9,7 +9,7 @@ const IssuePage = lazy(() =>
 
 export function Router() {
   return (
-    <Suspense fallback={<p>Carregando...</p>}>
+    <Suspense fallback={<p>Loading...</p>}>
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route path="/" element={<Home />} />
