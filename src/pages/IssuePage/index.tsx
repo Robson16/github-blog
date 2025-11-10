@@ -46,6 +46,9 @@ export function IssuePage() {
   })
 
   useEffect(() => {
+    // TODO: To improve API error handling, for example:
+    // add an `isLoading` state and an error message, the latter to show
+    // if there is a problem with the GitHub API.
     async function loadIssue() {
       const number = Number(issueNumber)
 
@@ -55,7 +58,7 @@ export function IssuePage() {
       }
 
       const data = await fetchIssue(number)
-      setIssue(data)
+      setIssue(data ?? null)
     }
 
     loadIssue()

@@ -16,8 +16,6 @@ import {
   ProfileTitle,
 } from './styles'
 
-const PROFILE_USERNAME = import.meta.env.VITE_GITHUB_USERNAME
-
 export function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null)
 
@@ -26,9 +24,12 @@ export function Profile() {
   })
 
   useEffect(() => {
+    // TODO: To improve API error handling, for example:
+    // add an `isLoading` state and an error message, the latter to show
+    // if there is a problem with the GitHub API.
     async function loadProfile() {
-      const profile = await fetchProfile(PROFILE_USERNAME)
-      setProfile(profile)
+      const profile = await fetchProfile()
+      setProfile(profile ?? null)
     }
 
     loadProfile()
